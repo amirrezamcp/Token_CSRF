@@ -1,24 +1,30 @@
-<?php
+<?php declare(strict_types=1); // strict requirement
+namespace src\Csrftoken;
 
-class CsrfToken{
-    public static function generate() {
-        if(!isset($_SESSION)) {
+class CsrfToken {
+
+    // generate CSRF Token
+    public static function generate() : string {
+        if (!isset($_SESSION)) {
             session_start();
         }
         $token = bin2hex(random_bytes(32));
-        $_SESSION['CSRF_TOKEN'] = $token;
+        $_SESSION['csrf_token'] = $token;
         return $token;
     }
 
-    public static function validate($token) {
-        if(!isset($_SESSION)) {
+    // Validate CSRF Token and return True/False
+    public static function validate($token) : bool {
+        if (!isset($_SESSION)) {
             session_start();
         }
-        if(!isset($_SESSION['CSRF_TOKEN']) && ($_SESSION('CSRF_TOKEN') !== $token)) {
+        if (!isset($_SESSION['csrf_token'])) {
             return false;
         }
-
-        unset($_SESSION['CSRF_TOKEN']);
-            return true;
+        if ($_SESSION['csrf_token'] !== $token) {
+            return false;
+        }
+        unset($_SESSION['csrf_token']);
+        return true;
     }
 }
